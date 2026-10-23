@@ -7,10 +7,10 @@ A high-throughput delay-task scheduler built on a hierarchical timing wheel
 
 | Step | Scope | State |
 |------|-------|-------|
-| 1 | Single-level wheel, doubly linked buckets, bucket-driven `DelayQueue`, cancel | done |
+| 1 | Single-level wheel, doubly linked buckets, bucket-driven `DelayQueue`| done |
 | 2 | Hierarchical wheel (overflow wheels + demotion) | done |
-| 3 | Pluggable execution layer (thread pool vs Disruptor) | next |
-| 4 | `TaskStore` (RocksDB / Redis), WAL-style persistence, crash recovery | |
+| 3 | Pluggable execution layer (thread pool vs Disruptor) | done |
+| 4 | `TaskStore` (RocksDB / Redis), WAL-style persistence, crash recovery |next |
 | 5 | ACK, retry, dead-letter queue (at-least-once) | |
 | 6 | JMH + load tests vs `DelayQueue`, Netty `HashedWheelTimer`, Redis ZSet | |
 
