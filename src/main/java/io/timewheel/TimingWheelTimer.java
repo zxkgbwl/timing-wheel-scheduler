@@ -1,6 +1,7 @@
 package io.timewheel;
 
 
+import javax.print.attribute.standard.NumberOfInterveningJobs;
 import java.util.Objects;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Executor;
@@ -13,7 +14,7 @@ public final class TimingWheelTimer implements AutoCloseable {
     private static final System.Logger LOG = System.getLogger(TimingWheelTimer.class.getName());
     private static final long DRIVER_POOL_MS = 100L;
 
-    private final Executor executor;
+    private final TaskExecutor executor;
     private final Clock clock;
     private final DelayQueue<TimerTaskList> delayQueue = new DelayQueue<>();
     private final AtomicInteger taskCounter = new AtomicInteger();
@@ -26,14 +27,24 @@ public final class TimingWheelTimer implements AutoCloseable {
     // used as a indicator for other thread
     private volatile boolean running;
 
+    //run due tasks on a caller-owned executor, timer never shuts it down
     public TimingWheelTimer(long tickMs, int wheelSize, Executor executor) {
+        this(tickMs, wheelSize, new ThreadPoolTaskExecutor(executor), Clock.SYSTEM);
+    }
+
+    public TimingWheelTimer(long tickMs, int wheelSize, Executor executor, Clock clock) {
+        this(tickMs, wheelSize, new ThreadPoolTaskExecutor(executor), clock);
+    }
+
+    //run due tasks on executor, the caller owns it: close  the timer first,then close it.
+    public TimingWheelTimer(long tickMs, int wheelSize, TaskExecutor executor) {
         this(tickMs, wheelSize, executor, Clock.SYSTEM);
     }
 
-    public TimingWheelTimer(long tickMs, int wheeeSize, Executor executor, Clock clock) {
-        this.executor = executor;
+    public TimingWheelTimer(long tickMs, int wheelSize, TaskExecutor executor, Clock clock) {
+        this.executor = Objects.requireNonNull(executor, "executor");
         this.clock = Objects.requireNonNull(clock, "clock");
-        this.wheel = new TimingWheel(tickMs, wheeeSize, clock.nowMs(), delayQueue, taskCounter, clock);
+        this.wheel = new TimingWheel(tickMs, wheelSize, clock.nowMs(), delayQueue, taskCounter, clock);
     }
 
     //Schedule to run action no ealier than delayMs form now/
@@ -60,6 +71,7 @@ public final class TimingWheelTimer implements AutoCloseable {
     }
     //number of task waiting in buckets
     public int size() {
+
         return taskCounter.get();
     }
 
@@ -127,19 +139,15 @@ public final class TimingWheelTimer implements AutoCloseable {
     }
 
     private void fire(TimerTask task) {
+        boolean accepted = false;
         try {
-            executor.execute(() -> {
-                if (task.tryFire()) {
-                    try {
-                        task.action().run();
-                    }catch (Throwable t) {
-                        LOG.log(System.Logger.Level.ERROR, "scheduled task threw exception", t);
-                    }
-                }
-            });
-
-        }catch (RuntimeException e) {
-            LOG.log(System.Logger.Level.ERROR, "executor rejected a due task", e);
+            accepted = executor.submit(task);
+        }catch(RuntimeException e) {
+            LOG.log(System.Logger.Level.ERROR, "executor failed to accept a due task", e);
+            return;
+        }
+        if (!accepted) {
+            LOG.log(System.Logger.Level.ERROR, "executor rejected a due task");
         }
     }
 

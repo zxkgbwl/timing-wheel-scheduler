@@ -111,4 +111,26 @@ class TimerTaskTest {
             assertEquals(1, wins.get(), "round " + round);
         }
     }
+
+    @Test
+    void runIfPendingRunsOnceAndSwallowsExceptions() {
+        AtomicInteger runs = new AtomicInteger();
+        TimerTask task = new TimerTask(0, () -> {
+            runs.incrementAndGet();
+            throw new IllegalStateException("boom");
+        });
+        task.runIfInPending();
+        task.runIfInPending();
+        assertEquals(1, runs.get());
+        assertTrue(task.isFired());
+    }
+
+    @Test
+    void runIfPendingSkipsACancelledTask() {
+        AtomicInteger runs = new AtomicInteger();
+        TimerTask task = new TimerTask(0, runs::incrementAndGet);
+        task.cancel();
+        task.runIfInPending();
+        assertEquals(0, runs.get());
+    }
 }
