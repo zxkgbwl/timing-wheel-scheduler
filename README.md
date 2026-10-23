@@ -1,4 +1,5 @@
 # timing-wheel-scheduler
+[![CI](https://github.com/zxkgbwl/timing-wheel-scheduler/actions/workflows/ci.yml/badge.svg)](https://github.com/zxkgbwl/timing-wheel-scheduler/actions/workflows/ci.yml)
 
 A high-throughput delay-task scheduler built on a hierarchical timing wheel
 (O(1) insert/cancel, vs O(log N) for `DelayQueue`).
