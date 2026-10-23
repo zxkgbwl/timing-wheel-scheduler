@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 //
 public final class TimerTask {
+    private static final System.Logger LOG = System.getLogger(TimerTask.class.getName());
     private static final int PENDING =0;
     private static final int CANCELLED =1;
     private static final int FIRED = 2;
@@ -51,6 +52,16 @@ public final class TimerTask {
 
     Runnable action() {
         return action;
+    }
+
+    public void runIfInPending() {
+        if (tryFire()) {
+            try {
+                action.run();
+            } catch (Throwable t) {
+                LOG.log(System.Logger.Level.ERROR, "scheduled task threw exception", t);
+            }
+        }
     }
 
 
