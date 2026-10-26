@@ -28,6 +28,11 @@
             <artifactId>disruptor</artifactId>
             <version>3.4.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.rocksdb</groupId>
+            <artifactId>rocksdbjni</artifactId>
+            <version>10.5.1</version>
+        </dependency>
     </dependencies>
 
     <build>
