@@ -40,8 +40,10 @@ public final class CrashRecoveryDemo {
             timer.start();
             DurableScheduler scheduler = new DurableScheduler(timer, store, record ->
                     System.out.printf("[%tT] FIRED %s  payload=\"%s\"  was due at %tT%n",
-                            System.currentTimeMillis(), record.id(),
-                            new String(record.payload(), StandardCharsets.UTF_8), record.deadlineEpochMs()));
+                            System.currentTimeMillis(),
+                            record.id(),
+                            new String(record.payload(), StandardCharsets.UTF_8),
+                            record.deadlineEpochMs()));
 
             int recovered = scheduler.recover();
             System.out.printf("[%tT] recovered %d pending task(s) from %s%n",
