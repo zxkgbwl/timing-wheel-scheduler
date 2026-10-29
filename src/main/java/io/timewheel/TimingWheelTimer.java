@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 public final class TimingWheelTimer implements AutoCloseable {
     private static final System.Logger LOG = System.getLogger(TimingWheelTimer.class.getName());
@@ -22,6 +23,8 @@ public final class TimingWheelTimer implements AutoCloseable {
     private final ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
     private final Lock readLock = rwlock.readLock();
     private final Lock writeLock = rwlock.writeLock();
+
+    private volatile Consumer<TimerTask> rejectionHandler;
 
     private Thread driver;
     // used as a indicator for other thread
@@ -68,6 +71,10 @@ public final class TimingWheelTimer implements AutoCloseable {
             readLock.unlock();
         }
         return task;
+    }
+
+    public void setRejectionHandler(Consumer<TimerTask> rejectionHandler) {
+        this.rejectionHandler = rejectionHandler;
     }
     //number of task waiting in buckets
     public int size() {
@@ -144,16 +151,25 @@ public final class TimingWheelTimer implements AutoCloseable {
             accepted = executor.submit(task);
         }catch(RuntimeException e) {
             LOG.log(System.Logger.Level.ERROR, "executor failed to accept a due task", e);
+            accepted = false;
+        }
+        if (accepted) {
             return;
         }
-        if (!accepted) {
-            LOG.log(System.Logger.Level.ERROR, "executor rejected a due task");
+        //if the task is rejected
+        Consumer<TimerTask> rejectionHandler = this.rejectionHandler;
+        if (rejectionHandler != null) {
+            try{
+                rejectionHandler.accept(task);
+                return;
+            } catch(RuntimeException e) {
+                LOG.log(System.Logger.Level.ERROR, "rejection handler failed", e);
+            }
         }
+
+        LOG.log(System.Logger.Level.ERROR, "executor rejected a due task");
+
     }
-
-
-
-
 
 
 }
