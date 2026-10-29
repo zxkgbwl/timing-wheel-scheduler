@@ -11,22 +11,36 @@ import java.util.Objects;
  * payload is immutable
  */
 public final class TaskRecord {
-    private static final byte FORMAT_VERSION = 1;
+    private static final byte VERSION_1 = 1;
+    private static final byte VERSION_2 = 2;
     //version 1 byte, deadline 8 bytes, idLength 4 bytes
-    private static final int HEADER_BYTES = 1 + 8 + 4;
+    private static final int MAX_ERROR_CHARS = 500;
 
     private final String id;
     private final long deadlineEpochMs;
     private final byte[] payload;
+    private final int attempts;
+    private final String lastError;
 
     public TaskRecord(String id, long deadlineEpochMs, byte[] payload) {
+        this(id, deadlineEpochMs, payload, 0, null);
+    }
+
+    public TaskRecord(String id, long deadlineEpochMs, byte[] payload, int attempts, String lastError) {
         Objects.requireNonNull(id, "id is null");
-        if (id.isBlank()) {
-            throw new IllegalArgumentException("id is blank");
+        if (id.isEmpty()) {
+            throw new IllegalArgumentException("id is empty");
+        }
+        if (attempts < 0) {
+            throw new IllegalArgumentException("attempts must be >= 0");
         }
         this.id = id;
         this.deadlineEpochMs = deadlineEpochMs;
         this.payload = payload == null ? new byte[0] : payload.clone();
+
+        this.attempts = attempts;
+        this.lastError = lastError == null || lastError.length() <= MAX_ERROR_CHARS ? lastError
+                : lastError.substring(0, MAX_ERROR_CHARS);
     }
 
     public String id() {
@@ -41,17 +55,42 @@ public final class TaskRecord {
         return payload.clone();
     }
 
+    public int attempts() {
+        return attempts;
+    }
+
+    public String lastError() {
+        return lastError;
+    }
+
+    public TaskRecord afterFailedAttempt(String error, long nextDeadlineEpochMs) {
+        return new TaskRecord(id, nextDeadlineEpochMs, payload, attempts + 1, error);
+    }
+
+    public TaskRecord restarted(long newDeadlineEpochMs) {
+        return new TaskRecord(id, newDeadlineEpochMs, payload, 0, null);
+    }
+
     //layout : version(1) | deadline(8) | idLength(4) | id | payloadLength(4) \ payload
     //TaskRecord to Byte
     public byte[] toBytes() {
         byte[] idBytes = id.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer buffer = ByteBuffer.allocate (HEADER_BYTES + idBytes.length + 4 + payload.length);
-        buffer.put(FORMAT_VERSION); //1
-        buffer.putLong(deadlineEpochMs); //8
-        buffer.putInt(idBytes.length); //4
-        buffer.put(idBytes); //idBytes.length varied
-        buffer.putInt(payload.length); //4
-        buffer.put(payload); //payload.length
+        byte[] errBytes = lastError == null ? null : lastError.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer buffer = ByteBuffer.allocate(1 + 8 + 4 + 4 + idBytes.length + 4 + payload.length
+                + 4 + (errBytes == null ? 0 : errBytes.length));
+        buffer.put(VERSION_2);
+        buffer.putLong(deadlineEpochMs);
+        buffer.putInt(attempts);
+        buffer.putInt(idBytes.length);
+        buffer.put(idBytes);
+        buffer.putInt(payload.length);
+        buffer.put(payload);
+        if (errBytes == null) {
+            buffer.putInt(-1);
+        } else {
+            buffer.putInt(errBytes.length);
+            buffer.put(errBytes);
+        }
         return buffer.array();
     }
 
@@ -60,26 +99,34 @@ public final class TaskRecord {
         try {
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
             byte version = buffer.get();
-            if (version != FORMAT_VERSION) {
-                throw new IllegalArgumentException("invalid format version");
+            if (version != VERSION_1 && version != VERSION_2) {
+                throw new IllegalArgumentException("unsupported record version " + version);
             }
-            long deadlineEpochMs = buffer.getLong();
-            byte[] idBytes = readBlock(buffer);
-            byte[] payload = readBlock(buffer);
+            long deadline = buffer.getLong();
+            int attempts = version == VERSION_2 ? buffer.getInt() : 0;
+            byte[] idBytes = readBlock(buffer, false);
+            byte[] payload = readBlock(buffer, false);
+            String error = null;
+            if (version == VERSION_2) {
+                byte[] errBytes = readBlock(buffer, true);
+                error = errBytes == null ? null : new String(errBytes, StandardCharsets.UTF_8);
+            }
             if (buffer.hasRemaining()) {
-                throw new IllegalArgumentException("tailing type after record");
+                throw new IllegalArgumentException("trailing bytes after record");
             }
-            return new TaskRecord(new String(idBytes, StandardCharsets.UTF_8), deadlineEpochMs, payload);
-
+            return new TaskRecord(new String(idBytes, StandardCharsets.UTF_8), deadline, payload, attempts, error);
         } catch (java.nio.BufferUnderflowException e) {
             throw new IllegalArgumentException("truncated record", e);
         }
     }
 
-    private static byte[] readBlock (ByteBuffer buffer) {
+    private static byte[] readBlock(ByteBuffer buffer, boolean nullable) {
         int length = buffer.getInt();
+        if (nullable && length == -1) {
+            return null;
+        }
         if (length < 0 || length > buffer.remaining()) {
-            throw new IllegalArgumentException("invalid length" + length);
+            throw new IllegalArgumentException("invalid length " + length);
         }
         byte[] block = new byte[length];
         buffer.get(block);
@@ -91,26 +138,25 @@ public final class TaskRecord {
         if (this == o) {
             return true;
         }
-        if(!(o instanceof TaskRecord)) {
+        if (!(o instanceof TaskRecord)) {
             return false;
         }
         TaskRecord other = (TaskRecord) o;
-        return deadlineEpochMs == other.deadlineEpochMs
-                && id.equals(other.id)
-                && Arrays.equals(payload, other.payload);
+        return deadlineEpochMs == other.deadlineEpochMs && attempts == other.attempts
+                && id.equals(other.id) && Arrays.equals(payload, other.payload)
+                && Objects.equals(lastError, other.lastError);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(deadlineEpochMs, id) * 31 + Arrays.hashCode(payload);
+        return (Objects.hash(id, deadlineEpochMs, attempts, lastError) * 31) + Arrays.hashCode(payload);
     }
 
     @Override
     public String toString() {
-        return "TaskRecord{id=" + id + ", deadlineEpochMs=" + deadlineEpochMs
-                + ", payloadBytes=" + payload.length + "}";
+        return "TaskRecord{id=" + id + ", deadlineEpochMs=" + deadlineEpochMs + ", attempts=" + attempts
+                + ", payloadBytes=" + payload.length + (lastError == null ? "" : ", lastError=" + lastError) + '}';
     }
-
 
 
 

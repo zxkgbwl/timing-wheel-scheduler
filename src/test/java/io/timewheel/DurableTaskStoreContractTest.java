@@ -124,6 +124,39 @@ abstract class DurableTaskStoreContractTest extends TaskStoreContractTest {
     }
 
     @Test
+    void retryStateAndDeadLettersSurviveReopen() {
+        Path dir = newDirectory();
+        TaskStore first = open(dir);
+        assertTrue(first.putIfAbsent(record("retrying", 1)));
+        assertTrue(first.putIfAbsent(record("dying", 2)));
+        assertTrue(first.putIfAbsent(record("revived", 3)));
+        assertTrue(first.replace(new TaskRecord("retrying", 9_000, new byte[] {1, 2, 3}, 2, "boom")));
+        assertTrue(first.deadLetter(new TaskRecord("dying", 2, new byte[] {1, 2, 3}, 5, "fatal")));
+        assertTrue(first.deadLetter(new TaskRecord("revived", 3, new byte[] {1, 2, 3}, 5, "fatal")));
+        assertTrue(first.requeueDeadLetter("revived", 77).isPresent());
+        first.close();
+
+        TaskStore second = open(dir);
+        try {
+            Map<String, TaskRecord> active = byId(second.loadAll());
+            assertEquals(2, active.size());
+            assertEquals(2, active.get("retrying").attempts());
+            assertEquals("boom", active.get("retrying").lastError());
+            assertEquals(9_000, active.get("retrying").deadlineEpochMs());
+            assertEquals(0, active.get("revived").attempts());
+            assertEquals(77, active.get("revived").deadlineEpochMs());
+
+            List<TaskRecord> dead = second.loadDeadLetters();
+            assertEquals(1, dead.size());
+            assertEquals("dying", dead.get(0).id());
+            assertEquals(5, dead.get(0).attempts());
+            assertEquals("fatal", dead.get(0).lastError());
+        } finally {
+            second.close();
+        }
+    }
+
+    @Test
     void dataSurvivesManyReopenCycles() {
         Path dir = newDirectory();
         for (int cycle = 0; cycle < 5; cycle++) {

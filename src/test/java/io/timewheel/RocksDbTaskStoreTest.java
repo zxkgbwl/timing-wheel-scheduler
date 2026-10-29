@@ -52,7 +52,7 @@ class RocksDbTaskStoreTest extends DurableTaskStoreContractTest {
         RocksDB.loadLibrary();
         try (Options options = new Options().setCreateIfMissing(true);
              RocksDB raw = RocksDB.open(options, dir.toString())) {
-            raw.put("bad".getBytes(), new byte[] {9, 9, 9});
+            raw.put("a:bad".getBytes(), new byte[] {9, 9, 9});
         }
 
         TaskStore second = open(dir);
