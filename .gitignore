@@ -47,3 +47,5 @@ benchmarks/results/
 benchmarks/results-run*/
 *.jfr
 hs_err_pid*.log
+
+demo-data/
