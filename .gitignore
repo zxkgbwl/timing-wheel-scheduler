@@ -12,6 +12,7 @@ target/
 *.iws
 *.iml
 *.ipr
+next.txt
 
 ### Eclipse ###
 .apt_generated
@@ -39,3 +40,10 @@ build/
 .DS_Store
 .idea/
 'nddemo-data
+
+benchmarks/results/
+
+benchmarks/results/
+benchmarks/results-run*/
+*.jfr
+hs_err_pid*.log
