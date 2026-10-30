@@ -49,3 +49,5 @@ benchmarks/results-run*/
 hs_err_pid*.log
 
 demo-data/
+
+benchmarks/dependency-reduced-pom.xml
