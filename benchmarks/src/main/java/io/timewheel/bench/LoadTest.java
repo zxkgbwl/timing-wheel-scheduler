@@ -200,7 +200,10 @@ public final class LoadTest {
             }
             long due = (long) ((now - start) / 1e9 * perSecond) - produced;
             if (due <= 0) {
-                LockSupport.parkNanos(50_000);
+                // Wake about once per millisecond. A much shorter park makes the generator burn CPU
+                // on wake-ups wherever parking is precise (Linux), which inflates every candidate's
+                // CPU figure; where parking is coarse (Windows) this only means larger batches.
+                LockSupport.parkNanos(1_000_000);
                 continue;
             }
             long batch = Math.min(due, 5_000); // do not try to catch up in one huge burst

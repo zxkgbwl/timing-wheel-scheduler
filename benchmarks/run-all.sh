@@ -38,7 +38,11 @@ done
 
 collect() {  # pattern, output
   local first
-  first=$(ls results/$1-*.txt | head -n 1)
+  first=$(ls results/$1-*.txt 2>/dev/null | head -n 1 || true)
+  if [ -z "$first" ]; then
+    echo "no $1 results to collect"
+    return 0
+  fi
   { grep -h '^CSV_HEADER,' "$first" | head -n 1 | sed 's/^CSV_HEADER,//'
     grep -h '^CSV,' results/$1-*.txt | sed 's/^CSV,//'; } > "$2"
 }
