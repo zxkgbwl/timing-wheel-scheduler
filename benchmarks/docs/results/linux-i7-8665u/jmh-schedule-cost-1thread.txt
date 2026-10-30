@@ -1,0 +1,399 @@
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = wheel, pending = 1000)
+
+# Run progress: 0.00% complete, ETA 00:03:12
+# Fork: 1 of 1
+# Warmup Iteration   1: 205.177 ns/op
+# Warmup Iteration   2: 212.341 ns/op
+# Warmup Iteration   3: 215.170 ns/op
+Iteration   1: 202.355 ns/op
+Iteration   2: 186.915 ns/op
+Iteration   3: 187.161 ns/op
+Iteration   4: 187.593 ns/op
+Iteration   5: 188.513 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  190.507 ±(99.9%) 25.611 ns/op [Average]
+  (min, avg, max) = (186.915, 190.507, 202.355), stdev = 6.651
+  CI (99.9%): [164.896, 216.119] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = wheel, pending = 100000)
+
+# Run progress: 8.33% complete, ETA 00:02:59
+# Fork: 1 of 1
+# Warmup Iteration   1: 199.641 ns/op
+# Warmup Iteration   2: 215.991 ns/op
+# Warmup Iteration   3: 217.797 ns/op
+Iteration   1: 213.809 ns/op
+Iteration   2: 196.406 ns/op
+Iteration   3: 197.004 ns/op
+Iteration   4: 196.236 ns/op
+Iteration   5: 194.264 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  199.544 ±(99.9%) 30.961 ns/op [Average]
+  (min, avg, max) = (194.264, 199.544, 213.809), stdev = 8.040
+  CI (99.9%): [168.583, 230.505] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = wheel, pending = 1000000)
+
+# Run progress: 16.67% complete, ETA 00:02:43
+# Fork: 1 of 1
+# Warmup Iteration   1: 224.366 ns/op
+# Warmup Iteration   2: 216.524 ns/op
+# Warmup Iteration   3: 221.135 ns/op
+Iteration   1: 235.686 ns/op
+Iteration   2: 235.756 ns/op
+Iteration   3: 229.679 ns/op
+Iteration   4: 213.782 ns/op
+Iteration   5: 213.542 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  225.689 ±(99.9%) 43.332 ns/op [Average]
+  (min, avg, max) = (213.542, 225.689, 235.756), stdev = 11.253
+  CI (99.9%): [182.357, 269.021] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = delayqueue, pending = 1000)
+
+# Run progress: 25.00% complete, ETA 00:02:27
+# Fork: 1 of 1
+# Warmup Iteration   1: 106.196 ns/op
+# Warmup Iteration   2: 106.528 ns/op
+# Warmup Iteration   3: 112.339 ns/op
+Iteration   1: 97.568 ns/op
+Iteration   2: 94.355 ns/op
+Iteration   3: 2963.128 ns/op
+Iteration   4: 455.720 ns/op
+Iteration   5: 330.653 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  788.285 ±(99.9%) 4719.435 ns/op [Average]
+  (min, avg, max) = (94.355, 788.285, 2963.128), stdev = 1225.622
+  CI (99.9%): [≈ 0, 5507.720] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = delayqueue, pending = 100000)
+
+# Run progress: 33.33% complete, ETA 00:02:18
+# Fork: 1 of 1
+# Warmup Iteration   1: 117.360 ns/op
+# Warmup Iteration   2: 120.295 ns/op
+# Warmup Iteration   3: 122.325 ns/op
+Iteration   1: 125.785 ns/op
+Iteration   2: 92.174 ns/op
+Iteration   3: 601.726 ns/op
+Iteration   4: 494.526 ns/op
+Iteration   5: 333.138 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  329.470 ±(99.9%) 859.258 ns/op [Average]
+  (min, avg, max) = (92.174, 329.470, 601.726), stdev = 223.147
+  CI (99.9%): [≈ 0, 1188.728] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = delayqueue, pending = 1000000)
+
+# Run progress: 41.67% complete, ETA 00:02:07
+# Fork: 1 of 1
+# Warmup Iteration   1: 123.594 ns/op
+# Warmup Iteration   2: 113.923 ns/op
+# Warmup Iteration   3: 120.855 ns/op
+Iteration   1: 121.574 ns/op
+Iteration   2: 88.752 ns/op
+Iteration   3: 756.029 ns/op
+Iteration   4: 494.061 ns/op
+Iteration   5: 339.485 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  359.980 ±(99.9%) 1064.433 ns/op [Average]
+  (min, avg, max) = (88.752, 359.980, 756.029), stdev = 276.430
+  CI (99.9%): [≈ 0, 1424.413] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = stpe, pending = 1000)
+
+# Run progress: 50.00% complete, ETA 00:01:52
+# Fork: 1 of 1
+# Warmup Iteration   1: 145.347 ns/op
+# Warmup Iteration   2: 141.016 ns/op
+# Warmup Iteration   3: 112.124 ns/op
+Iteration   1: 108.656 ns/op
+Iteration   2: 106.467 ns/op
+Iteration   3: 99.404 ns/op
+Iteration   4: 98.508 ns/op
+Iteration   5: 98.815 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  102.370 ±(99.9%) 18.532 ns/op [Average]
+  (min, avg, max) = (98.508, 102.370, 108.656), stdev = 4.813
+  CI (99.9%): [83.837, 120.902] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = stpe, pending = 100000)
+
+# Run progress: 58.33% complete, ETA 00:01:32
+# Fork: 1 of 1
+# Warmup Iteration   1: 111.166 ns/op
+# Warmup Iteration   2: 121.445 ns/op
+# Warmup Iteration   3: 97.308 ns/op
+Iteration   1: 95.359 ns/op
+Iteration   2: 95.498 ns/op
+Iteration   3: 94.582 ns/op
+Iteration   4: 90.362 ns/op
+Iteration   5: 90.902 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  93.341 ±(99.9%) 9.644 ns/op [Average]
+  (min, avg, max) = (90.362, 93.341, 95.498), stdev = 2.505
+  CI (99.9%): [83.696, 102.985] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = stpe, pending = 1000000)
+
+# Run progress: 66.67% complete, ETA 00:01:12
+# Fork: 1 of 1
+# Warmup Iteration   1: 154.246 ns/op
+# Warmup Iteration   2: 152.059 ns/op
+# Warmup Iteration   3: 159.008 ns/op
+Iteration   1: 151.315 ns/op
+Iteration   2: 145.465 ns/op
+Iteration   3: 145.262 ns/op
+Iteration   4: 145.350 ns/op
+Iteration   5: 145.064 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  146.491 ±(99.9%) 10.398 ns/op [Average]
+  (min, avg, max) = (145.064, 146.491, 151.315), stdev = 2.700
+  CI (99.9%): [136.093, 156.890] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = netty, pending = 1000)
+
+# Run progress: 75.00% complete, ETA 00:00:54
+# Fork: 1 of 1
+# Warmup Iteration   1: 80.557 ns/op
+# Warmup Iteration   2: 73.322 ns/op
+# Warmup Iteration   3: 71.620 ns/op
+Iteration   1: 80.714 ns/op
+Iteration   2: 85.857 ns/op
+Iteration   3: 83.975 ns/op
+Iteration   4: 85.384 ns/op
+Iteration   5: 88.234 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  84.833 ±(99.9%) 10.653 ns/op [Average]
+  (min, avg, max) = (80.714, 84.833, 88.234), stdev = 2.767
+  CI (99.9%): [74.179, 95.486] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = netty, pending = 100000)
+
+# Run progress: 83.33% complete, ETA 00:00:35
+# Fork: 1 of 1
+# Warmup Iteration   1: 87.545 ns/op
+# Warmup Iteration   2: 91.348 ns/op
+# Warmup Iteration   3: 87.001 ns/op
+Iteration   1: 69.783 ns/op
+Iteration   2: 76.130 ns/op
+Iteration   3: 82.597 ns/op
+Iteration   4: 84.799 ns/op
+Iteration   5: 88.570 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  80.376 ±(99.9%) 28.679 ns/op [Average]
+  (min, avg, max) = (69.783, 80.376, 88.570), stdev = 7.448
+  CI (99.9%): [51.697, 109.055] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: -Xms4g -Xmx4g
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 2 s each
+# Measurement: 5 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel
+# Parameters: (impl = netty, pending = 1000000)
+
+# Run progress: 91.67% complete, ETA 00:00:17
+# Fork: 1 of 1
+# Warmup Iteration   1: 85.075 ns/op
+# Warmup Iteration   2: 90.478 ns/op
+# Warmup Iteration   3: 71.466 ns/op
+Iteration   1: 72.614 ns/op
+Iteration   2: 69.264 ns/op
+Iteration   3: 71.966 ns/op
+Iteration   4: 78.491 ns/op
+Iteration   5: 77.926 ns/op
+
+
+Result "io.timewheel.bench.SchedulingCostBenchmark.scheduleAndCancel":
+  74.052 ±(99.9%) 15.410 ns/op [Average]
+  (min, avg, max) = (69.264, 74.052, 78.491), stdev = 4.002
+  CI (99.9%): [58.643, 89.462] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:03:31
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+NOTE: Current JVM experimentally supports Compiler Blackholes, and they are in use. Please exercise
+extra caution when trusting the results, look into the generated code to check the benchmark still
+works, and factor in a small probability of new VM bugs. Additionally, while comparisons between
+different JVMs are already problematic, the performance difference caused by different Blackhole
+modes can be very significant. Please make sure you use the consistent Blackhole mode for comparisons.
+
+Benchmark                                      (impl)  (pending)  Mode  Cnt    Score      Error  Units
+SchedulingCostBenchmark.scheduleAndCancel       wheel       1000  avgt    5  190.507 ±   25.611  ns/op
+SchedulingCostBenchmark.scheduleAndCancel       wheel     100000  avgt    5  199.544 ±   30.961  ns/op
+SchedulingCostBenchmark.scheduleAndCancel       wheel    1000000  avgt    5  225.689 ±   43.332  ns/op
+SchedulingCostBenchmark.scheduleAndCancel  delayqueue       1000  avgt    5  788.285 ± 4719.435  ns/op
+SchedulingCostBenchmark.scheduleAndCancel  delayqueue     100000  avgt    5  329.470 ±  859.258  ns/op
+SchedulingCostBenchmark.scheduleAndCancel  delayqueue    1000000  avgt    5  359.980 ± 1064.433  ns/op
+SchedulingCostBenchmark.scheduleAndCancel        stpe       1000  avgt    5  102.370 ±   18.532  ns/op
+SchedulingCostBenchmark.scheduleAndCancel        stpe     100000  avgt    5   93.341 ±    9.644  ns/op
+SchedulingCostBenchmark.scheduleAndCancel        stpe    1000000  avgt    5  146.491 ±   10.398  ns/op
+SchedulingCostBenchmark.scheduleAndCancel       netty       1000  avgt    5   84.833 ±   10.653  ns/op
+SchedulingCostBenchmark.scheduleAndCancel       netty     100000  avgt    5   80.376 ±   28.679  ns/op
+SchedulingCostBenchmark.scheduleAndCancel       netty    1000000  avgt    5   74.052 ±   15.410  ns/op

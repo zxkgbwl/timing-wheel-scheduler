@@ -1,136 +1,137 @@
 # timing-wheel-scheduler
+
 [![CI](https://github.com/zxkgbwl/timing-wheel-scheduler/actions/workflows/ci.yml/badge.svg)](https://github.com/zxkgbwl/timing-wheel-scheduler/actions/workflows/ci.yml)
 
-A high-throughput delay-task scheduler built on a hierarchical timing wheel
-(O(1) insert/cancel, vs O(log N) for `DelayQueue`).
+A **hierarchical timing wheel** for Java 17+ with a pluggable execution layer and an optional
+**durable layer** that adds crash recovery, at-least-once delivery, retry with backoff and a
+dead-letter store. Built for workloads such as "cancel the order if it is still unpaid after 30
+minutes", at a rate where a heap-based `DelayQueue` becomes expensive.
 
-## Status
+It is measured, not just claimed: the repository includes a benchmark against `DelayQueue`,
+`ScheduledThreadPoolExecutor` and Netty's `HashedWheelTimer`, with raw data and an honest account of where
+this timer is **slower** than they are. Start with [Benchmarks at a glance](#benchmarks-at-a-glance).
 
-| Step | Scope | State |
-|------|-------|-------|
-| 1 | Single-level wheel, doubly linked buckets, bucket-driven `DelayQueue`| done |
-| 2 | Hierarchical wheel (overflow wheels + demotion) | done |
-| 3 | Pluggable execution layer (thread pool vs Disruptor) | done |
-| 4 | `TaskStore` (RocksDB / Redis), WAL-style persistence, crash recovery |done |
-| 5 | ACK, retry, dead-letter queue (at-least-once) | done |
-| 6 | JMH + load tests vs `DelayQueue`, Netty `HashedWheelTimer`, Redis ZSet | |
+## Features
 
-## Design notes (step 1)
+- **O(1) insert and cancel** with a hierarchy of wheels created on demand; any delay is accepted.
+- **Never early** (to the millisecond), at most one tick late.
+- **One `DelayQueue` of non-empty buckets** drives all levels, so the driver thread sleeps until the
+  next occupied bucket instead of ticking.
+- **Cancelled timers free their memory immediately.**
+- **Pluggable execution:** a bounded thread pool or an LMAX Disruptor ring buffer; a full executor is
+  visible (`submit` returns `false`) and never blocks the timer.
+- **Durable tasks** (optional): stored before they are armed, re-armed with the remaining time after a
+  crash, acknowledged by the handler returning, retried with exponential backoff and jitter, and moved
+  to a dead-letter store when attempts run out.
+- Embedded **RocksDB** store, or an in-memory store for tests.
 
-- **Never early, at most `tickMs - 1` late.** A task goes to the bucket of the first tick
-  boundary at or after its deadline.
-- **Buckets drive time, not ticks.** A `DelayQueue` holds one element per non-empty bucket, so
-  the driver sleeps until the next occupied bucket instead of waking every tick.
-- **Reads/writes are separated.** `schedule` takes a read lock (parallel producers);
-  `advanceClock` takes the write lock to move time and flush buckets.
-- **Actions never run on the driver thread.** They go to the supplied `Executor`.
-- **Exactly-once state machine.** `PENDING -> CANCELLED | FIRED` via CAS, so a task never runs
-  twice and never runs after a successful `cancel()`.
+## Quick start
 
-## Design notes (step 2: hierarchical wheel)
+Maven, Java 17 or newer:
 
-- **Any delay is accepted.** A task that does not fit the finest wheel goes to a lazily created
-  coarser wheel (level 2, 3, ...). Levels are created on demand; a long idle timer holds one.
-- **Finest level rounds up, coarse levels round down.** Level 1 puts a task at the first tick
-  boundary at or after its deadline (never early). Level 2+ puts it in the bucket that *starts*
-  at or before the deadline; when that bucket is due, its tasks are **demoted**: re-inserted into
-  a finer level, which positions them precisely. Tasks never fire from a coarse bucket.
-- **Tick sizes make demotion terminate.** With level-1 tick `t` and size `n`, level 2 uses tick
-  `(n-1)*t` (exactly the span level 1 can hold), level 3 uses `n*(n-1)*t`, and so on. A demoted
-  task therefore always fits the level below, and every coarse bucket starts strictly after the
-  level-1 time, so it can never be due the moment it is created (which would loop forever).
-- **Level 1 leaves the current-tick slot free.** That slot may still hold a bucket waiting to be
-  flushed; reusing it would change the expiration of a bucket already inside the `DelayQueue`.
-- All levels share one `DelayQueue`, so the driver still sleeps until the single earliest bucket,
-  whichever level it belongs to.
+```
+mvn verify
+```
 
-
-## Design notes (step 3: pluggable execution layer)
-
-- **`TaskExecutor` is the only thing the timer knows about execution.** The driver thread calls
-  `submit(task)`; the implementation decides which thread runs it. `ThreadPoolTaskExecutor` and
-  `DisruptorTaskExecutor` are interchangeable, which is what makes the step-6 comparison fair.
-- **`submit` never blocks.** A blocked driver stops the whole wheel, so a full queue / ring buffer
-  returns `false`. Both implementations use a bounded buffer for the same reason.
-- **One place defines "run a task".** `TimerTask.runIfPending()` is what every worker calls: it
-  runs at most once, never after a successful `cancel()`, and swallows exceptions. A new executor
-  cannot get these rules wrong because it does not implement them.
-- **Disruptor specifics.** Multi-producer (already-due tasks are submitted from the caller's
-  thread, later ones from the driver), a worker pool so each slot is consumed by exactly one
-  worker, `tryPublishEvent` for the non-blocking hand-off, and a configurable wait strategy.
-- **One contract test, two implementations.** `TaskExecutorContractTest` is inherited by both
-  executor tests, so they are held to identical behaviour.
-- **Known gap (step 5):** a task rejected by a full executor has already left the wheel and is
-  only logged, not retried.
-
-## Design notes (step 4: persistence and crash recovery)
-
-- **A `Runnable` cannot be persisted, so durable tasks are data.** `TaskRecord` = id + absolute
-  wall-clock deadline + opaque payload. After a restart a `TaskHandler` is given the record.
-- **Deadlines are wall-clock, the wheel is monotonic.** The wheel runs on `System.nanoTime`, which
-  restarts from an arbitrary origin, so the persisted deadline is epoch milliseconds and recovery
-  re-arms each task with `deadline - now`. Overdue tasks run immediately, in deadline order.
-- **Ordering is the whole design.**
-  - schedule: write the record, THEN arm the wheel (a crash in between leaves a stored task);
-  - fire: run the handler, THEN remove the record (a crash in between re-runs the task);
-  - cancel: remove the record, THEN cancel the wheel entry (a crash in between cannot resurrect it).
-- **At-least-once delivery.** Handlers must be idempotent. Returning normally acknowledges the
-  task; throwing keeps the record for redelivery after the next recovery.
-- **`recover()` before `schedule()`**, enforced. A record that cannot be re-armed is logged and
-  skipped; one bad record does not block the rest.
-- **`TaskStore` is an interface** with an in-memory implementation (tests) and a RocksDB one. Both
-  run the same contract tests; the durable ones also reopen the store and check nothing was lost.
-- **Known gaps (step 5):** a failed handler or an executor-rejected task is not retried until the
-  next recovery, and many overdue tasks fire at once after a long outage.
-
-
-## Design notes (step 5: acknowledgement, retry and dead letters)
-
-- **ACK / NACK is the handler's return.** Returning normally acknowledges the task (its record is
-  removed). Throwing is a failed attempt. Throwing `NonRetryableException` means "retrying cannot
-  help" and skips the remaining attempts.
-- **Retry = exponential backoff with a cap and jitter** (`RetryPolicy`). `maxAttempts` counts the
-  first attempt; the jitter spreads out tasks that failed together so they do not retry together.
-- **Retry state is persisted before the retry is armed.** The record is rewritten with
-  `attempts + 1`, the last error and the NEXT deadline, then re-armed. A crash while a task waits
-  for its retry keeps the attempt count, so a poison task cannot retry forever by crashing the
-  process, and the retry fires at the right wall-clock time after recovery.
-- **Dead letters are a second set in the same store.** When attempts run out the record moves
-  there in one atomic step (a single RocksDB `WriteBatch`). Recovery ignores dead letters; a
-  human can list them, retry one (attempts reset) or discard it.
-- **A refusal by a full executor is not a failure.** The handler never ran, so no attempt is used:
-  the timer reports the refused task through a rejection handler and the scheduler re-offers it
-  shortly after. Without this, a burst of overdue tasks after an outage could exhaust attempts
-  that were never really used.
-- **Cancel is strict.** Before starting a task the scheduler re-checks that its record still
-  exists, so once `cancel(id)` has returned true the handler will not be started, including for
-  a task that is waiting for a retry or for the executor.
-- **Delivery stays at-least-once**, so handlers must be idempotent. `TaskRecord.attempts()` tells a
-  handler whether it is running a retry.
-- **Storage format:** records are written as version 2 (adds attempts and last error) and version 1
-  records still load. The RocksDB key layout is now prefixed (`a:` active, `d:` dead); delete a
-  `demo-data` directory created by step 4.
-
-## Demo
-
-`CrashRecoveryDemo`: `demo-3` fails twice and then succeeds (retry), `demo-4` always fails and
-ends in the dead-letter store. Kill the process at any point and run it again with `recover`.
-
-## Usage
+A plain timer:
 
 ```java
-ExecutorService workers = Executors.newFixedThreadPool(8);
-try (TimingWheelTimer timer = new TimingWheelTimer(1, 512, workers)) { // 1 ms tick, 512 buckets per level
+TaskExecutor executor = new ThreadPoolTaskExecutor(8, 4096);        // or new DisruptorTaskExecutor(8, 4096)
+try (TimingWheelTimer timer = new TimingWheelTimer(1, 4096, executor)) {   // 1 ms tick, 4096 buckets per level
     timer.start();
-    TimerTask t = timer.schedule(30 * 60_000, () -> System.out.println("fired")); // 30 minutes
-    // t.cancel();
-    Thread.sleep(2000);
+    TimerTask task = timer.schedule(30 * 60_000, () -> System.out.println("order timed out"));
+    // task.cancel();
 }
-workers.shutdown();
+executor.close();                                                    // close the timer first, then its executor
 ```
 
-## Build
+Durable tasks that survive a crash:
+
+```java
+try (RocksDbTaskStore store = new RocksDbTaskStore(Path.of("data"));
+     TimingWheelTimer timer = new TimingWheelTimer(1, 4096, executor)) {
+    timer.start();
+    DurableScheduler scheduler = new DurableScheduler(timer, store,
+            record -> cancelOrderIfUnpaid(record.id()),             // must be idempotent: delivery is at-least-once
+            new DurableScheduler.Options().retryPolicy(RetryPolicy.defaults()));
+    scheduler.recover();                                            // re-arms whatever was pending when the process died
+    scheduler.schedule("order-42", 30 * 60_000, payloadBytes);
+}
+```
+
+To see it work, run `io.timewheel.demo.CrashRecoveryDemo` with the argument `schedule`, kill the process,
+then run it again with `recover`.
+
+### Choosing the wheel size
+
+The first level covers `(wheelSize − 1) × tickMs`. Delays longer than that pass through the next level
+and are moved down when their coarse bucket is due. If most of your delays are a few seconds, size the first level
+to cover them: with delays of 0.5–3 s, **4096 buckets gave p99 lateness 1.05 ms against 6.17 ms for 512**, and
+12 % less CPU ([data](benchmarks/RESULTS.md)). Long delays (the 30-minute order) use the higher levels
+whatever you choose; see [Known limitations](#known-limitations).
+
+## Benchmarks at a glance
+
+One Linux laptop (Intel i7-8665U, 15 W), 200 000 timers/s, about 350 000 pending, tasks run inline,
+median of 3 runs. **CPU is net of the load generator.** Details, method and raw data:
+[`benchmarks/RESULTS.md`](benchmarks/RESULTS.md).
+
+| | CPU per timer | p99 lateness | Memory per pending timer | Held after cancelling |
+|---|---|---|---|---|
+| Netty `HashedWheelTimer` | **0.68 µs** | 2.07 ms | 99 B | 0 % |
+| **This wheel (4096 buckets)** | 0.77 µs | 1.05 ms | 112 B | 0 % |
+| This wheel (512 buckets) | 0.90 µs | 6.17 ms | 112 B | 0 % |
+| `DelayQueue` (lazy cancel) | 1.13 µs | **0.02 ms** | **62 B** | **100 %** |
+| `ScheduledThreadPoolExecutor` | 1.50 µs | **0.02 ms** | 126 B | 5 % |
+
+What this says, without spin:
+
+- Under load the wheel is **cheaper than the heap-based timers** and within about 13 % of Netty when it is sized well.
+- Its cost per call does not grow with the number of pending timers (+13 % from 100 k to 1 M, against
+  +57 % for the heap), **but a single call is still about twice as expensive** as the heap's and 2.5× Netty's.
+- Because it works in milliseconds, its p99 lateness cannot go below about 1 ms; the heap-based timers
+  wake with nanosecond precision.
+- It needs more memory per pending timer than a plain `DelayQueue`, and gives it back when timers are cancelled.
+- Netty has no persistence, recovery, retry or dead-letter store; that is where this project differs.
+
+## Project status
+
+| Phase | Scope | State |
+|---|---|---|
+| 1 | hierarchical wheel, pluggable executors, durable scheduling with crash recovery, retry and dead letters, benchmarks | **done** — see the [Phase 1 report](docs/PHASE1-REPORT.md) |
+| 2 | optimisation driven by the Phase 1 measurements | planned: [Phase 2 plan](docs/PHASE1-REPORT.md#6-phase-2-plan) |
+
+## Known limitations
+
+1. **Resolution is 1 ms.** A task may run less than 1 ms before its exact-nanosecond deadline.
+2. **Large coarse buckets stall the timer.** Timers with delays beyond the first level are flushed together when
+   their coarse bucket is due, and the work grows with the arrival rate. At 200 000/s this raised p99 from 1 ms
+   to 6 ms; at 1 000 000/s it has not been measured. Phase 2, task 1.
+3. A single schedule+cancel call is slower than in the alternatives (≈190 ns against ≈100 ns and ≈80 ns), and memory per pending timer is higher (112 B).
+4. No candidate, this one included, scales with the number of producer threads.
+5. **Delivery is at-least-once**; handlers must be idempotent.
+6. Durable deadlines use the **wall clock**, so a clock jump shifts them.
+7. One process owns a RocksDB store. There is **crash recovery, not high availability** across nodes.
+8. The Redis ZSet baseline is implemented but has **not been measured**; all measurements come from one machine.
+
+## Documentation
+
+| Document | What it covers |
+|---|---|
+| [`docs/DESIGN.md`](docs/DESIGN.md) | architecture, the level arithmetic, durability ordering, testing, decisions |
+| [`docs/PHASE1-REPORT.md`](docs/PHASE1-REPORT.md) | what was built, the benchmark process including the mistakes, limitations, Phase 2 plan |
+| [`benchmarks/RESULTS.md`](benchmarks/RESULTS.md) | measured results with conditions |
+| [`benchmarks/README.md`](benchmarks/README.md) | how to run the benchmarks and read them |
+
+## Repository layout
 
 ```
-mvn test
+src/main/java/io/timewheel/    the library
+src/test/java/io/timewheel/    tests, including contract tests and the crash-recovery demo
+benchmarks/                    separate Maven project: JMH, load and memory tests, run scripts, published data
+docs/                          design and phase reports
 ```
+
+## License
+
+See [`LICENSE`](LICENSE).

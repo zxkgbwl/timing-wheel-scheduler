@@ -1,0 +1,232 @@
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: <none>
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.ComponentCostBenchmark.atomicGetAndSet
+
+# Run progress: 0.00% complete, ETA 00:00:56
+# Fork: 1 of 1
+# Warmup Iteration   1: 5.382 ns/op
+# Warmup Iteration   2: 5.361 ns/op
+# Warmup Iteration   3: 5.344 ns/op
+Iteration   1: 5.350 ns/op
+Iteration   2: 5.350 ns/op
+Iteration   3: 5.349 ns/op
+Iteration   4: 5.348 ns/op
+Iteration   5: 5.348 ns/op
+
+
+Result "io.timewheel.bench.ComponentCostBenchmark.atomicGetAndSet":
+  5.349 ±(99.9%) 0.004 ns/op [Average]
+  (min, avg, max) = (5.348, 5.349, 5.350), stdev = 0.001
+  CI (99.9%): [5.345, 5.353] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: <none>
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.ComponentCostBenchmark.atomicIncrementAndDecrement
+
+# Run progress: 14.29% complete, ETA 00:00:49
+# Fork: 1 of 1
+# Warmup Iteration   1: 9.294 ns/op
+# Warmup Iteration   2: 9.318 ns/op
+# Warmup Iteration   3: 9.270 ns/op
+Iteration   1: 9.279 ns/op
+Iteration   2: 9.299 ns/op
+Iteration   3: 9.328 ns/op
+Iteration   4: 9.326 ns/op
+Iteration   5: 9.322 ns/op
+
+
+Result "io.timewheel.bench.ComponentCostBenchmark.atomicIncrementAndDecrement":
+  9.311 ±(99.9%) 0.082 ns/op [Average]
+  (min, avg, max) = (9.279, 9.311, 9.328), stdev = 0.021
+  CI (99.9%): [9.228, 9.393] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: <none>
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.ComponentCostBenchmark.floorDivByRuntimeValue
+
+# Run progress: 28.57% complete, ETA 00:00:41
+# Fork: 1 of 1
+# Warmup Iteration   1: 7.575 ns/op
+# Warmup Iteration   2: 7.520 ns/op
+# Warmup Iteration   3: 7.492 ns/op
+Iteration   1: 7.487 ns/op
+Iteration   2: 7.475 ns/op
+Iteration   3: 7.477 ns/op
+Iteration   4: 7.463 ns/op
+Iteration   5: 7.465 ns/op
+
+
+Result "io.timewheel.bench.ComponentCostBenchmark.floorDivByRuntimeValue":
+  7.473 ±(99.9%) 0.037 ns/op [Average]
+  (min, avg, max) = (7.463, 7.473, 7.487), stdev = 0.010
+  CI (99.9%): [7.436, 7.511] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: <none>
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.ComponentCostBenchmark.floorModByRuntimeValue
+
+# Run progress: 42.86% complete, ETA 00:00:32
+# Fork: 1 of 1
+# Warmup Iteration   1: 7.558 ns/op
+# Warmup Iteration   2: 7.501 ns/op
+# Warmup Iteration   3: 7.451 ns/op
+Iteration   1: 7.428 ns/op
+Iteration   2: 7.449 ns/op
+Iteration   3: 7.452 ns/op
+Iteration   4: 7.469 ns/op
+Iteration   5: 7.447 ns/op
+
+
+Result "io.timewheel.bench.ComponentCostBenchmark.floorModByRuntimeValue":
+  7.449 ±(99.9%) 0.057 ns/op [Average]
+  (min, avg, max) = (7.428, 7.449, 7.469), stdev = 0.015
+  CI (99.9%): [7.392, 7.506] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: <none>
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.ComponentCostBenchmark.nanoTime
+
+# Run progress: 57.14% complete, ETA 00:00:24
+# Fork: 1 of 1
+# Warmup Iteration   1: 14.837 ns/op
+# Warmup Iteration   2: 14.793 ns/op
+# Warmup Iteration   3: 14.613 ns/op
+Iteration   1: 14.599 ns/op
+Iteration   2: 14.613 ns/op
+Iteration   3: 14.633 ns/op
+Iteration   4: 14.621 ns/op
+Iteration   5: 14.619 ns/op
+
+
+Result "io.timewheel.bench.ComponentCostBenchmark.nanoTime":
+  14.617 ±(99.9%) 0.048 ns/op [Average]
+  (min, avg, max) = (14.599, 14.617, 14.633), stdev = 0.012
+  CI (99.9%): [14.569, 14.665] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: <none>
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.ComponentCostBenchmark.nestedMonitorsOnePair
+
+# Run progress: 71.43% complete, ETA 00:00:16
+# Fork: 1 of 1
+# Warmup Iteration   1: 24.035 ns/op
+# Warmup Iteration   2: 25.302 ns/op
+# Warmup Iteration   3: 25.366 ns/op
+Iteration   1: 26.506 ns/op
+Iteration   2: 26.138 ns/op
+Iteration   3: 26.335 ns/op
+Iteration   4: 26.367 ns/op
+Iteration   5: 26.249 ns/op
+
+
+Result "io.timewheel.bench.ComponentCostBenchmark.nestedMonitorsOnePair":
+  26.319 ±(99.9%) 0.527 ns/op [Average]
+  (min, avg, max) = (26.138, 26.319, 26.506), stdev = 0.137
+  CI (99.9%): [25.791, 26.846] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+1-1-24.04.4-Ubuntu
+# VM invoker: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+# VM options: <none>
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: io.timewheel.bench.ComponentCostBenchmark.readLockPair
+
+# Run progress: 85.71% complete, ETA 00:00:08
+# Fork: 1 of 1
+# Warmup Iteration   1: 14.649 ns/op
+# Warmup Iteration   2: 14.667 ns/op
+# Warmup Iteration   3: 14.227 ns/op
+Iteration   1: 14.221 ns/op
+Iteration   2: 14.196 ns/op
+Iteration   3: 14.209 ns/op
+Iteration   4: 14.211 ns/op
+Iteration   5: 14.210 ns/op
+
+
+Result "io.timewheel.bench.ComponentCostBenchmark.readLockPair":
+  14.209 ±(99.9%) 0.034 ns/op [Average]
+  (min, avg, max) = (14.196, 14.209, 14.221), stdev = 0.009
+  CI (99.9%): [14.175, 14.244] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:00:57
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+NOTE: Current JVM experimentally supports Compiler Blackholes, and they are in use. Please exercise
+extra caution when trusting the results, look into the generated code to check the benchmark still
+works, and factor in a small probability of new VM bugs. Additionally, while comparisons between
+different JVMs are already problematic, the performance difference caused by different Blackhole
+modes can be very significant. Please make sure you use the consistent Blackhole mode for comparisons.
+
+Benchmark                                           Mode  Cnt   Score   Error  Units
+ComponentCostBenchmark.atomicGetAndSet              avgt    5   5.349 ± 0.004  ns/op
+ComponentCostBenchmark.atomicIncrementAndDecrement  avgt    5   9.311 ± 0.082  ns/op
+ComponentCostBenchmark.floorDivByRuntimeValue       avgt    5   7.473 ± 0.037  ns/op
+ComponentCostBenchmark.floorModByRuntimeValue       avgt    5   7.449 ± 0.057  ns/op
+ComponentCostBenchmark.nanoTime                     avgt    5  14.617 ± 0.048  ns/op
+ComponentCostBenchmark.nestedMonitorsOnePair        avgt    5  26.319 ± 0.527  ns/op
+ComponentCostBenchmark.readLockPair                 avgt    5  14.209 ± 0.034  ns/op

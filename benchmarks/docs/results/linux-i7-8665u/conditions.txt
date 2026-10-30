@@ -1,0 +1,14 @@
+CPU(s):                                  8
+Model name:                              Intel(R) Core(TM) i7-8665U CPU @ 1.90GHz
+Thread(s) per core:                      2
+Core(s) per socket:                      4
+CPU(s) scaling MHz:                      80%
+CPU max MHz:                             4800.0000
+CPU min MHz:                             400.0000
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       1.2Gi        11Gi        30Mi       2.8Gi        14Gi
+openjdk version "21.0.12.1" 2026-08-18
+cpu governor : performance
+turbo off    : 0   (1 = turbo disabled)
+on AC power  : 1   (1 = yes)
+producers=2 rate=200000 seconds=20 heap=4g flags=-XX:+UseG1GC
