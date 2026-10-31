@@ -166,7 +166,6 @@ public final class TimingWheelTimer implements AutoCloseable {
                 LOG.log(System.Logger.Level.ERROR, "rejection handler failed", e);
             }
         }
-
         LOG.log(System.Logger.Level.ERROR, "executor rejected a due task");
 
     }
