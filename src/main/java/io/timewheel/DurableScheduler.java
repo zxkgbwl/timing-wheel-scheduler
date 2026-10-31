@@ -239,7 +239,7 @@ public final class DurableScheduler {
 
         if (failure == null) {
             acknowledge(id);
-        } {
+        } else {
             onFailure(record, failure);
         }
     }
